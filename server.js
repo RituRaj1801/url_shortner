@@ -10,19 +10,19 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.use(express.json());
-    
+app.use(express.static("public")); // ✅ Move this to the top
+
 app.set("view engine", "ejs");
 app.set("views", join(process.cwd(), "public", "view"));
-app.get('/template', (req, res) => {
-    res.render("template",{'html': 'Hello World!'});
-})
+
 app.get("/", (req, res) => {
     res.sendFile(join(process.cwd(), "public", "view", "url_shortner.html"));
 });
-app.get("/testing", (req, res) => {
-    const data = { status: true, status_code: 200, message: "website working" };
-    res.json(data);
-});
+app.get('/testing',(req,res)=>{
+    const data={"status":true,"status_code":200,"message":"API is working"};
+    res.json(data)
+})
+
 app.use("/api", shortenRoutes);
 
 app.get('/:shortCode', async (req, res) => {
@@ -42,6 +42,3 @@ app.get('/:shortCode', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 Server started on http://localhost:${PORT}`));
-app.use(express.static("public"));
-
-
