@@ -24,13 +24,15 @@
     </div>
 
     <script>
+        const short_url=`${window.location.origin}/api/shorten`;
+        console.log(short_url);
 
         $('#url-form').submit(async function (event) {
             event.preventDefault();
             const longUrl = $('#long-url').val();
             if (longUrl != "") {
                 try {
-                    const response = await fetch(`${window.location.origin}/api/shorten`, {
+                    const response = await fetch(short_url, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
