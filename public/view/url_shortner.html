@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="../assets/css/url_shortner.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <form id="url-form">
+            <div class="input-group">
+                <label for="long-url">Enter Long URL:</label>
+                <input type="text" id="long-url" name="long_url" placeholder="https://www.example.com" required>
+            </div>
+            <button type="submit">Shorten URL</button>
+        </form>
+        <div id="shortened-url" style="display: none;"></div>
+    </div>
+
+    <script>
+        $('#url-form').submit(async function (event) {
+            event.preventDefault();
+
+            const longUrl = $('#long-url').val();
+
+            try {
+                const response = await fetch("/api/shorten", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ long_url: longUrl })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log(result);
+
+                if (result.short_url) {
+                    $('#shortened-url').show();
+                    document.getElementById("shortened-url").innerHTML = `
+                        <p>Shortened URL: 
+                            <a href="${result.short_url}" target="_blank" id="short-url">${result.short_url}</a>
+                        </p>
+                        <button onclick="copyToClipboard()">Copy</button>
+                    `;
+                } else {
+                    throw new Error("Invalid response format");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("shortened-url").innerHTML =
+                    `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+
+        function copyToClipboard() {
+            const shortUrl = document.getElementById("short-url").href;
+            navigator.clipboard.writeText(shortUrl)
+                .then(() => {
+                    alert("Shortened URL copied to clipboard!");
+                })
+                .catch(err => {
+                    console.error("Failed to copy:", err);
+                });
+        }
+    </script>
+</body>
+
+</html>
