@@ -4,15 +4,16 @@ import ShortURL from "../models/ShortURL.js";
 const router = express.Router();
 
 router.post("/shorten", async (req, res) => {
-    const data = { status: false, status_code: 400, message: "" };
-
-    const { long_url } = req.body;
-    if (!long_url) {
-        data.message = "URL is required!";
-        return res.json(data);
-    }
+    const timeout = setTimeout(() => {
+        return res.status(504).json({ status: false, message: "Request timed out" });
+    }, 9000); // 9 seconds (Vercel allows up to 10s for free users)
 
     try {
+        const { long_url } = req.body;
+        if (!long_url) {
+            return res.json({ status: false, message: "URL is required!" });
+        }
+
         const url = new URL(long_url);
         const shortCode = Math.random().toString(36).substring(2, 8);
         const shortUrl = `${req.protocol}://${req.get("host")}/${shortCode}`;
@@ -24,16 +25,14 @@ router.post("/shorten", async (req, res) => {
         });
 
         await newShortUrl.save();
+        clearTimeout(timeout); // Clear timeout on success
 
-        data.status = true;
-        data.status_code = 200;
-        data.message = "URL shortened successfully!";
-        data.short_url = shortUrl;
+        return res.json({ status: true, short_url: shortUrl, message: "URL shortened successfully!" });
     } catch (error) {
-        data.message = "Invalid URL format!";
+        clearTimeout(timeout);
+        return res.json({ status: false, message: "Invalid URL format!" });
     }
-
-    res.json(data);
 });
+
 
 export default router;
