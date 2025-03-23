@@ -7,7 +7,7 @@ import ShortURL from "./models/ShortURL.js"; // ✅ Import the ShortURL model
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
+// Connect to MongoDB 
 connectDB();
 
 app.use(express.json());
