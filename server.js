@@ -19,6 +19,10 @@ app.get('/template', (req, res) => {
 app.get("/", (req, res) => {
     res.sendFile(join(process.cwd(), "public", "view", "url_shortner.html"));
 });
+app.get("/testing", (req, res) => {
+    const data = { status: true, status_code: 200, message: "website working" };
+    res.json(data);
+});
 app.use("/api", shortenRoutes);
 
 app.get('/:shortCode', async (req, res) => {

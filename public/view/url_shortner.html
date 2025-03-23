@@ -24,42 +24,43 @@
     </div>
 
     <script>
+
         $('#url-form').submit(async function (event) {
             event.preventDefault();
-
             const longUrl = $('#long-url').val();
+            if (longUrl != "") {
+                try {
+                    const response = await fetch(`${window.location.origin}/api/shorten`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ long_url: longUrl })
+                    });
 
-            try {
-                const response = await fetch("/api/shorten", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ long_url: longUrl })
-                });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+                    const result = await response.json();
+                    console.log(result);
 
-                const result = await response.json();
-                console.log(result);
-
-                if (result.short_url) {
-                    $('#shortened-url').show();
-                    document.getElementById("shortened-url").innerHTML = `
+                    if (result.short_url) {
+                        $('#shortened-url').show();
+                        document.getElementById("shortened-url").innerHTML = `
                         <p>Shortened URL: 
                             <a href="${result.short_url}" target="_blank" id="short-url">${result.short_url}</a>
                         </p>
                         <button onclick="copyToClipboard()">Copy</button>
                     `;
-                } else {
-                    throw new Error("Invalid response format");
+                    } else {
+                        throw new Error("Invalid response format");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    document.getElementById("shortened-url").innerHTML =
+                        `<p style="color: red;">Error: ${error.message}</p>`;
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById("shortened-url").innerHTML =
-                    `<p style="color: red;">Error: ${error.message}</p>`;
             }
         });
 
