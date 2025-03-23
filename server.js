@@ -10,10 +10,10 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.use(express.json());
-app.use(express.static("public")); // ✅ Move this to the top
+app.use(express.static(join(process.cwd(), "public")));     
 
-app.set("view engine", "ejs");
-app.set("views", join(process.cwd(), "public", "view"));
+// app.set("view engine", "ejs");
+// app.set("views", join(process.cwd(), "public", "view")); 
 
 app.get("/", (req, res) => {
     res.sendFile(join(process.cwd(), "public", "view", "url_shortner.html"));
